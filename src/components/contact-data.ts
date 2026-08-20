@@ -3,7 +3,7 @@
  * et une URL sont identiques dans les trois langues, les tripler inviterait
  * la divergence. Seuls les libellés sont traduits.
  */
-export const WHATSAPP_NUMBER_DISPLAY = "066547912";
+export const WHATSAPP_NUMBER_DISPLAY = "0665479126";
 
 /** Format international requis par wa.me : indicatif Maroc, sans le 0 initial. */
 export const WHATSAPP_URL = `https://wa.me/212${WHATSAPP_NUMBER_DISPLAY.replace(/^0/, "")}`;
