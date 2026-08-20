@@ -19,10 +19,9 @@ export const fr: Dictionary = {
     language: "Choisir la langue",
   },
   hero: {
-    eyebrow: "BabaCake",
+    brand: "BabaCake",
     title: [[{ t: "L’art du" }], [{ t: "gâteau " }, { t: "3D", accent: true }]],
     tagline: "Créations uniques façonnées avec précision.",
-    cta: "Découvrir nos créations",
     location: "Salé · Maroc",
   },
   captions: {
@@ -30,6 +29,14 @@ export const fr: Dictionary = {
     idee: [[{ t: "De l’idée" }], [{ t: "à la création" }]],
     detail: [[{ t: "Chaque détail" }], [{ t: "compte." }]],
     savoir: [[{ t: "Voyez notre " }, { t: "savoir-faire", accent: true }]],
+  },
+  contact: {
+    title: "Parlons de votre création",
+    body: ["Une idée, un projet, un gâteau unique ?", "Parlons-en."],
+    whatsapp: "WhatsApp",
+    instagram: "Instagram",
+    facebook: "Facebook",
+    label: "Nous contacter",
   },
   gallery: {
     title: "Nos créations",

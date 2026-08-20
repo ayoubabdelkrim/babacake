@@ -25,10 +25,9 @@ export const ar: Dictionary = {
     language: "اختر اللغة",
   },
   hero: {
-    eyebrow: "بابا كيك",
+    brand: "BabaCake",
     title: [[{ t: "فن الكيك" }], [{ t: "ثلاثي الأبعاد", accent: true }]],
     tagline: "إبداعات فريدة تُصنع بدقة.",
-    cta: "اكتشف إبداعاتنا",
     location: "سلا · المغرب",
   },
   captions: {
@@ -36,6 +35,14 @@ export const ar: Dictionary = {
     idee: [[{ t: "من الفكرة" }], [{ t: "إلى الإبداع" }]],
     detail: [[{ t: "كل تفصيل" }], [{ t: "يصنع الفرق." }]],
     savoir: [[{ t: "اكتشفوا " }, { t: "مهارتنا", accent: true }]],
+  },
+  contact: {
+    title: "لِنُبدع شيئًا مميزًا",
+    body: ["لديك فكرة، مشروع، أو كعكة فريدة؟", "لنتحدث."],
+    whatsapp: "واتساب",
+    instagram: "إنستغرام",
+    facebook: "فيسبوك",
+    label: "تواصل معنا",
   },
   gallery: {
     title: "إبداعاتنا",

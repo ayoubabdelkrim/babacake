@@ -144,13 +144,21 @@ export function captionStyle(p: number, spec: CaptionSpec): CaptionStyle {
   };
 }
 
-/** La séquence. `intro` est le bloc déjà approuvé : il ne fait que sortir. */
+/**
+ * La séquence, six états. `brand` ouvre le site : son entrée est l'animation
+ * CSS de révélation, elle ne fait donc que sortir. Les fenêtres se chevauchent
+ * volontairement : la fenêtre d'entrée d'un message est exactement celle de
+ * sortie du précédent. C'est un fondu enchaîné — à mi-parcours les deux sont
+ * à 0,5 — plutôt qu'un relais décalé, qui creusait un instant presque vide
+ * (mesuré à 0,23 d'opacité maximale) entre deux messages.
+ */
 export const HERO_CAPTIONS: { id: string; spec: CaptionSpec }[] = [
-  { id: "intro", spec: { enter: null, exit: [0.17, 0.27] } },
-  { id: "forme", spec: { enter: [0.18, 0.27], exit: [0.36, 0.45] } },
-  { id: "idee", spec: { enter: [0.38, 0.47], exit: [0.61, 0.7] } },
-  { id: "detail", spec: { enter: [0.63, 0.72], exit: [0.81, 0.9] } },
-  { id: "savoir", spec: { enter: [0.83, 0.92], exit: null } },
+  { id: "brand", spec: { enter: null, exit: [0.12, 0.2] } },
+  { id: "title", spec: { enter: [0.12, 0.2], exit: [0.32, 0.4] } },
+  { id: "forme", spec: { enter: [0.32, 0.4], exit: [0.52, 0.6] } },
+  { id: "idee", spec: { enter: [0.52, 0.6], exit: [0.7, 0.78] } },
+  { id: "detail", spec: { enter: [0.7, 0.78], exit: [0.86, 0.93] } },
+  { id: "savoir", spec: { enter: [0.86, 0.93], exit: null } },
 ];
 
 /** Retrait du dernier mot pendant la respiration, image finale laissée seule. */

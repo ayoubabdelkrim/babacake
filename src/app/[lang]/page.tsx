@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import Contact from "@/components/Contact";
 import Gallery from "@/components/Gallery";
 import Hero from "@/components/Hero";
 import { getDictionary, isLocale } from "@/i18n";
@@ -14,6 +15,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
     <main className="flex-1">
       <Hero dict={dict} locale={lang} />
       <Gallery dict={dict} />
+      <Contact dict={dict} />
     </main>
   );
 }

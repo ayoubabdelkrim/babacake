@@ -19,13 +19,12 @@ export const en: Dictionary = {
     language: "Choose language",
   },
   hero: {
-    eyebrow: "BabaCake",
+    brand: "BabaCake",
     title: [
       [{ t: "The art of" }],
       [{ t: "the " }, { t: "3D", accent: true }, { t: " cake" }],
     ],
     tagline: "Unique creations shaped with precision.",
-    cta: "Discover our creations",
     location: "Salé · Morocco",
   },
   captions: {
@@ -33,6 +32,14 @@ export const en: Dictionary = {
     idee: [[{ t: "From idea" }], [{ t: "to creation" }]],
     detail: [[{ t: "Every detail" }], [{ t: "matters." }]],
     savoir: [[{ t: "Discover our " }, { t: "craft", accent: true }]],
+  },
+  contact: {
+    title: "Let’s create something special",
+    body: ["Have an idea, a project, or a unique cake in mind?", "Let’s talk."],
+    whatsapp: "WhatsApp",
+    instagram: "Instagram",
+    facebook: "Facebook",
+    label: "Contact us",
   },
   gallery: {
     title: "Our creations",

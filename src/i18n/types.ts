@@ -19,11 +19,12 @@ export type Dictionary = {
     language: string;
   };
   hero: {
-    eyebrow: string;
-    /** Titre principal, une entrée par ligne affichée. */
+    /** Révélation initiale, plein écran. La marque ne se traduit pas. */
+    brand: string;
+    /** Deuxième état du récit, et libellé lu par les technologies d'assistance. */
     title: Line[];
+    /** Description, réservée aux lecteurs d'écran : le Hero reste minimal. */
     tagline: string;
-    cta: string;
     location: string;
   };
   /** Récit synchronisé au défilement. Mêmes clés que la timeline existante. */
@@ -32,6 +33,16 @@ export type Dictionary = {
     idee: Line[];
     detail: Line[];
     savoir: Line[];
+  };
+  contact: {
+    title: string;
+    /** Accroche, une entrée par ligne affichée. */
+    body: string[];
+    whatsapp: string;
+    instagram: string;
+    facebook: string;
+    /** Intitulé accessible du groupe de liens. */
+    label: string;
   };
   gallery: {
     title: string;
