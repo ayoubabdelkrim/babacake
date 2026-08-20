@@ -1,26 +1,132 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Palette — pâtisserie: encre profonde, crème chaude, or discret */
+  --color-ink: #0e0b0a;
+  --color-espresso: #17120f;
+  --color-bark: #241c17;
+  --color-cream: #f5ecde;
+  --color-beige: #cdbba2;
+  --color-gold: #c9a96e;
+  --color-gold-lite: #e3cb9c;
+
+  --font-display: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-jost), ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  background-color: var(--color-ink);
+  color: var(--color-cream);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  /* Aucun débordement horizontal, quelle que soit la largeur */
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-gold);
+  color: var(--color-ink);
+}
+
+/* ---------- Révélations douces ---------- */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes veil {
+  from {
+    opacity: 0;
+    transform: scale(1.035);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes hairline {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.rv {
+  opacity: 0;
+  animation: rise 1s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+.rv-veil {
+  opacity: 0;
+  animation: veil 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+.rv-line {
+  transform-origin: left;
+  animation: hairline 1.2s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rv,
+  .rv-veil,
+  .rv-line {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Média du Hero ----------
+   Mobile : la vidéo 9:16 occupe tout l'écran (composition d'origine préservée).
+   Desktop : la vidéo devient une plaque éditoriale verticale, au ratio 9:16
+   exact — aucun recadrage, aucune déformation du chef ni du gâteau. */
+
+.hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* On remonte le cadrage : le chef et le gâteau vivent dans le tiers haut. */
+  object-position: 50% 38%;
+}
+
+@media (min-width: 1024px) {
+  .hero-media {
+    /* Bandeau cinématographique pleine hauteur, calé sur le bord droit.
+       Hauteur = 100svh, largeur = 9/16 de cette hauteur : ratio d'origine
+       respecté au pixel près, donc zéro recadrage et zéro déformation. */
+    inset: 0 0 auto auto;
+    height: 100svh;
+    width: calc(100svh * 0.5625);
+    transform: none;
+  }
+
+  .hero-media video {
+    object-position: 50% 50%;
+  }
+}
+
+/* Cormorant utilise des chiffres elzéviriens par défaut : on force des
+   chiffres alignés pour que « 3D » reste un signe de marque, pas un chiffre. */
+.lining-figures {
+  font-variant-numeric: lining-nums;
+  font-feature-settings: "lnum" 1;
 }

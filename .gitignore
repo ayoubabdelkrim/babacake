@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# hero video (23 MB) — volontairement hors du dépôt pour ne pas alourdir
+# l'historique git. À committer une fois compressé (~3-5 Mo + source WebM).
+# Le Hero attend le fichier ici : public/video/hero.mp4
+/public/video/
