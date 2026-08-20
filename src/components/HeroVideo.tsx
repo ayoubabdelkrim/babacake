@@ -3,10 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 
 import { refreshHeroProgress, subscribeHeroProgress } from "./hero-progress";
+import { HERO_POSTER } from "./hero-poster";
 import { shouldSeek, videoTimeAt, SETTLED } from "./hero-scrub";
 
-/** Source unique : un seul <video> pour mobile et desktop (un seul téléchargement). */
-export const HERO_VIDEO_SRC = "/video/hero.mp4";
+/**
+ * Source unique : un seul <video> pour mobile et desktop (un seul
+ * téléchargement). Version optimisée pour le web — même image, même cadrage,
+ * même 720×1280, mais 4,4 Mo au lieu de 23, sans piste audio, et une image clé
+ * toutes les 5 images pour que le scrub au défilement reste instantané.
+ * L'original reste dans public/video/hero.mp4 comme sauvegarde.
+ */
+export const HERO_VIDEO_SRC = "/video/hero-optimized.mp4";
 
 export default function HeroVideo() {
   const ref = useRef<HTMLVideoElement>(null);
@@ -19,8 +26,24 @@ export default function HeroVideo() {
     const track = video.closest<HTMLElement>("[data-hero-scroll]");
     if (!track) return;
 
-    // La vidéo n'est jamais jouée : elle est pilotée image par image.
-    video.pause();
+    // La vidéo n'est jamais lue : elle est pilotée image par image. Mais un
+    // décodeur qui n'a jamais démarré ne peint pas les `currentTime` sur iOS,
+    // et Safari ignore `preload` tant qu'aucune lecture n'a été demandée.
+    // On la démarre donc une fois, en sourdine, pour la mettre aussitôt en
+    // pause : c'est un amorçage de décodeur, pas une lecture.
+    video.muted = true;
+    let primed = false;
+    const prime = () => {
+      if (primed) return;
+      primed = true;
+      try {
+        const started = video.play();
+        if (started) started.then(() => video.pause()).catch(() => {});
+        else video.pause();
+      } catch {
+        /* Mode économie d'énergie : l'image d'attente reste affichée. */
+      }
+    };
 
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -36,8 +59,15 @@ export default function HeroVideo() {
     };
 
     const apply = (t: number) => {
-      applied = t;
-      video.currentTime = t;
+      // Un seek avant les métadonnées lève une exception sur certains mobiles ;
+      // sans première image décodée il ne peindrait rien de toute façon.
+      if (video.readyState < 2 /* HAVE_CURRENT_DATA */) return;
+      try {
+        video.currentTime = t;
+        applied = t;
+      } catch {
+        /* Seek momentanément indisponible : on retentera à la frame suivante. */
+      }
     };
 
     // On ne calcule plus la progression ici : elle vient de la source
@@ -53,8 +83,7 @@ export default function HeroVideo() {
 
     const onMeta = () => {
       duration = Number.isFinite(video.duration) ? video.duration : 0;
-      setReady(true);
-      video.pause();
+      prime();
       if (!duration) return;
 
       if (motion.matches) {
@@ -70,19 +99,50 @@ export default function HeroVideo() {
       else refreshHeroProgress();
     };
 
+    // On ne dévoile la vidéo que lorsqu'une image est réellement décodée
+    // (readyState >= 2). Auparavant l'affichage dépendait du seul
+    // `loadedmetadata` : si l'évènement n'arrivait jamais — ce que fait iOS
+    // tant que rien n'a été lu — l'élément restait à opacité 0 indéfiniment.
+    const showIfPainted = () => {
+      if (video.readyState >= 2) setReady(true);
+    };
+
+    const onError = () => {
+      // L'image d'attente reste en place : jamais de rectangle noir.
+      setReady(false);
+    };
+
     video.addEventListener("seeking", onSeeking);
     video.addEventListener("seeked", onSeeked);
-
-    if (video.readyState >= 1 /* HAVE_METADATA */) onMeta();
-    else video.addEventListener("loadedmetadata", onMeta);
-
+    video.addEventListener("loadedmetadata", onMeta);
+    video.addEventListener("loadeddata", showIfPainted);
+    video.addEventListener("canplay", showIfPainted);
+    video.addEventListener("error", onError);
     motion.addEventListener("change", onMotionChange);
+
+    // Safari ne charge rien de lui-même : ce coup de pouce déclenche la
+    // récupération des métadonnées et débloque tout le reste.
+    if (video.readyState === 0 /* HAVE_NOTHING */) video.load();
+    if (video.readyState >= 1) onMeta();
+    showIfPainted();
+    prime();
+
+    // Filet : si aucun évènement n'arrive, on revérifie une fois plutôt que
+    // de rester bloqué sur l'image d'attente alors que la vidéo est prête.
+    const safety = window.setTimeout(() => {
+      showIfPainted();
+      if (!duration && Number.isFinite(video.duration)) onMeta();
+    }, 2500);
 
     return () => {
       unsubscribe();
+      window.clearTimeout(safety);
       video.removeEventListener("seeking", onSeeking);
       video.removeEventListener("seeked", onSeeked);
       video.removeEventListener("loadedmetadata", onMeta);
+      video.removeEventListener("loadeddata", showIfPainted);
+      video.removeEventListener("canplay", showIfPainted);
+      video.removeEventListener("error", onError);
       motion.removeEventListener("change", onMotionChange);
     };
   }, []);
@@ -90,17 +150,28 @@ export default function HeroVideo() {
   return (
     <div className="hero-media">
       <div className="rv-veil relative h-full w-full overflow-hidden bg-espresso">
+        {/* Image d'attente, exactement au même cadrage que la vidéo. Elle
+            reste derrière : si le décodage échoue, le Hero garde une image. */}
+        {/* eslint-disable-next-line @next/next/no-img-element --
+            data URI de 1,4 ko : next/image n'a rien à optimiser ici et
+            ajouterait une requête là où l'objectif est de n'en avoir aucune. */}
+        <img
+          src={HERO_POSTER}
+          alt=""
+          aria-hidden="true"
+          className="hero-frame absolute inset-0 scale-105 blur-[6px]"
+        />
         <video
           ref={ref}
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
+          poster={HERO_POSTER}
           disablePictureInPicture
           controls={false}
           tabIndex={-1}
           aria-hidden="true"
-          onLoadedMetadata={() => setReady(true)}
-          className={`transition-opacity duration-1000 ease-out ${
+          className={`relative transition-opacity duration-700 ease-out ${
             ready ? "opacity-100" : "opacity-0"
           }`}
         >

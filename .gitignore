@@ -40,7 +40,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# hero video (23 MB) — volontairement hors du dépôt pour ne pas alourdir
-# l'historique git. À committer une fois compressé (~3-5 Mo + source WebM).
-# Le Hero attend le fichier ici : public/video/hero.mp4
-/public/video/
+# Vidéos du Hero.
+# On exclut le CONTENU du dossier plutôt que le dossier lui-même : git
+# n'entre pas dans un répertoire exclu, donc une négation à l'intérieur de
+# « /public/video/ » n'aurait jamais pu réinclure quoi que ce soit.
+/public/video/*
+# La version optimisée (4,43 Mo, sans audio, image clé toutes les 5 images)
+# est celle que sert l'application : elle doit être déployée.
+!/public/video/hero-optimized.mp4
+# L'original (23 Mo) reste une sauvegarde locale, hors dépôt.
