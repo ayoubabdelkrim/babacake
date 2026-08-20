@@ -14,13 +14,18 @@ const ICONS = {
   ),
 };
 
-const SOCIALS: { name: string; label: string; href: string; icon: keyof typeof ICONS }[] = [
+const SOCIALS: {
+  name: string;
+  label: string;
+  href: string;
+  icon: keyof typeof ICONS;
+}[] = [
   { name: "Instagram", label: "Instagram", href: "#", icon: "instagram" },
   { name: "Facebook", label: "Facebook", href: "#", icon: "facebook" },
   { name: "WhatsApp", label: "WhatsApp", href: "#", icon: "whatsapp" },
 ];
 
-export default function HeroSocials() {
+export default function HeroSocials({ location }: { location: string }) {
   return (
     <div className="flex items-center gap-6">
       <ul className="flex items-center gap-3">
@@ -49,7 +54,7 @@ export default function HeroSocials() {
       <span className="h-px w-8 bg-cream/20" aria-hidden="true" />
 
       <span className="font-sans text-[0.62rem] font-light tracking-[0.3em] text-cream/45 uppercase">
-        Salé · Maroc
+        {location}
       </span>
     </div>
   );

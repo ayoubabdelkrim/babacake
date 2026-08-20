@@ -3,34 +3,45 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const LINKS = [
-  { label: "Créations", href: "#creations" },
-  { label: "Sur mesure", href: "#sur-mesure" },
-  { label: "L’atelier", href: "#atelier" },
-  { label: "Contact", href: "#contact" },
-];
+import type { Dictionary, Locale } from "@/i18n";
 
-function Wordmark() {
+import LanguageSwitcher from "./LanguageSwitcher";
+
+function Wordmark({ locale, label }: { locale: Locale; label: string }) {
   return (
     <Link
-      href="/"
+      href={`/${locale}`}
       className="group flex items-center gap-3 outline-none"
-      aria-label="BabaCake — accueil"
+      aria-label={label}
     >
       <span className="flex h-8 w-8 items-center justify-center rounded-full border border-gold/35 transition-colors duration-500 group-hover:border-gold/70">
-        <span className="font-display text-[0.95rem] italic leading-none text-gold-lite">
+        {/* Le monogramme reste latin : c'est la marque, elle ne se traduit pas. */}
+        <span
+          dir="ltr"
+          className="font-display text-[0.95rem] leading-none text-gold-lite italic"
+        >
           b
         </span>
       </span>
-      <span className="font-sans text-[0.78rem] font-light tracking-[0.4em] text-cream">
+      <span
+        dir="ltr"
+        className="font-sans text-[0.78rem] font-light tracking-[0.4em] text-cream"
+      >
         BABACAKE
       </span>
     </Link>
   );
 }
 
-export default function SiteNav() {
+export default function SiteNav({
+  dict,
+  locale,
+}: {
+  dict: Dictionary;
+  locale: Locale;
+}) {
   const [open, setOpen] = useState(false);
+  const { nav } = dict;
 
   useEffect(() => {
     if (!open) return;
@@ -47,51 +58,64 @@ export default function SiteNav() {
   return (
     <>
       <header className="rv absolute inset-x-0 top-0 z-30 flex items-center justify-between px-6 py-6 sm:px-8 lg:px-[6vw] lg:py-9 2xl:px-[8vw]">
-        <Wordmark />
+        <Wordmark locale={locale} label={nav.home} />
 
-        <nav className="hidden lg:block" aria-label="Navigation principale">
-          <ul className="flex items-center gap-11">
-            {LINKS.map((link) => (
-              <li key={link.href}>
-                <a
-                  href={link.href}
-                  className="group relative block font-sans text-[0.68rem] font-light tracking-[0.26em] text-cream/70 uppercase transition-colors duration-500 hover:text-cream"
-                >
-                  {link.label}
-                  <span className="absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-gold/70 transition-transform duration-500 ease-out group-hover:scale-x-100" />
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <div className="flex items-center gap-8 xl:gap-11">
+          <nav className="hidden lg:block" aria-label={nav.links[0].label}>
+            <ul className="flex items-center gap-8 xl:gap-11">
+              {nav.links.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    className="group relative block font-sans text-[0.68rem] font-light tracking-[0.26em] text-cream/70 uppercase transition-colors duration-500 hover:text-cream"
+                  >
+                    {link.label}
+                    <span className="absolute -bottom-1.5 start-0 h-px w-full origin-left scale-x-0 bg-gold/70 transition-transform duration-500 ease-out group-hover:scale-x-100 rtl:origin-right" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
 
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          aria-label="Ouvrir le menu"
-          aria-expanded={open}
-          className="flex h-8 w-8 flex-col items-end justify-center gap-[5px] lg:hidden"
-        >
-          <span className="block h-px w-6 bg-cream/85" />
-          <span className="block h-px w-4 bg-cream/85" />
-        </button>
+          <LanguageSwitcher
+            locale={locale}
+            label={nav.language}
+            className="hidden sm:flex"
+          />
+
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            aria-label={nav.openMenu}
+            aria-expanded={open}
+            className="flex h-8 w-8 flex-col items-end justify-center gap-[5px] lg:hidden rtl:items-start"
+          >
+            <span className="block h-px w-6 bg-cream/85" />
+            <span className="block h-px w-4 bg-cream/85" />
+          </button>
+        </div>
       </header>
 
       {/* Menu mobile — volontairement dépouillé, la vidéo reste le sujet. */}
       <div
-        className={`fixed inset-0 z-50 bg-ink/97 backdrop-blur-[2px] transition-opacity duration-500 lg:hidden ${
+        // `invisible` fermé : sans lui le panneau reste dans l'ordre de
+        // tabulation et le sélecteur de langue qu'il contient est atteignable
+        // au clavier alors qu'il est invisible — et focalisable à l'intérieur
+        // d'un sous-arbre aria-hidden. La visibilité est incluse dans la
+        // transition pour que le fondu de sortie aille jusqu'au bout.
+        className={`fixed inset-0 z-50 bg-ink/97 backdrop-blur-[2px] transition-[opacity,visibility] duration-500 lg:hidden ${
           open
-            ? "pointer-events-auto opacity-100"
-            : "pointer-events-none opacity-0"
+            ? "pointer-events-auto visible opacity-100"
+            : "pointer-events-none invisible opacity-0"
         }`}
         aria-hidden={!open}
       >
         <div className="flex items-center justify-between px-6 py-6 sm:px-8">
-          <Wordmark />
+          <Wordmark locale={locale} label={nav.home} />
           <button
             type="button"
             onClick={() => setOpen(false)}
-            aria-label="Fermer le menu"
+            aria-label={nav.closeMenu}
             className="relative h-8 w-8"
             tabIndex={open ? 0 : -1}
           >
@@ -100,9 +124,9 @@ export default function SiteNav() {
           </button>
         </div>
 
-        <nav className="px-6 pt-16 sm:px-8" aria-label="Navigation mobile">
+        <nav className="px-6 pt-16 sm:px-8" aria-label={nav.links[0].label}>
           <ul className="flex flex-col gap-7">
-            {LINKS.map((link) => (
+            {nav.links.map((link) => (
               <li key={link.href}>
                 <a
                   href={link.href}
@@ -116,6 +140,14 @@ export default function SiteNav() {
             ))}
           </ul>
         </nav>
+
+        <div className="mt-14 px-6 sm:px-8">
+          <LanguageSwitcher
+            locale={locale}
+            label={nav.language}
+            tabIndex={open ? 0 : -1}
+          />
+        </div>
       </div>
     </>
   );
